@@ -16,9 +16,6 @@ from services.rabbitmq import get_rabbitmq_service, RabbitMQService
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# In-memory set to track existing orderIds
-existing_order_ids: set[str] = set()
-
 # Create router instance
 router = APIRouter(
     prefix="",
@@ -91,15 +88,11 @@ async def create_order(
     order_request: CreateOrderRequest,
     rabbitmq: RabbitMQService = Depends(get_rabbitmq_service)
 ):
-    """Create a new order with randomly generated data and publish to RabbitMQ"""
-    # Check if orderId already exists
-    if order_request.orderId in existing_order_ids:
-        logger.warning(f"Order ID already exists: {order_request.orderId}")
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Order with ID '{order_request.orderId}' already exists"
-        )
-    
+    """Create a new order with randomly generated data and publish to RabbitMQ.
+
+    Note: Duplicate order detection is intentionally handled in the order service
+    consumer/repository layer, not here in the cart service.
+    """
     # Generate random data
     customer_id = f"CUST_{generate_random_string(8)}"
     order_date = datetime.now().isoformat()
@@ -128,14 +121,8 @@ async def create_order(
         order_dict = order_response.model_dump()
         await rabbitmq.publish_order_event(order_dict, "order_created")
         logger.info(f"Order event published to RabbitMQ for order: {order_request.orderId}")
-        
-        # Add orderId to the set after successful publication
-        existing_order_ids.add(order_request.orderId)
     except Exception as rabbitmq_error:
         logger.error(f"Failed to publish to RabbitMQ: {str(rabbitmq_error)}")
-        # Note: We continue execution even if RabbitMQ fails
-        # Still add to set since order was created (RabbitMQ failure is non-critical)
-        existing_order_ids.add(order_request.orderId)
     
     logger.info(f"Order created successfully: {order_request.orderId}")
     return order_response

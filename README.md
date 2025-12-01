@@ -27,4 +27,3 @@
 - **Cart Service (producer)** declares the `orders_exchange` (Topic type, durable).  
 - **Order Service (consumer)** declares its dedicated durable queue (`order_service_new_orders`) and binds it to the existing exchange with pattern `"new.*"`.  
 - Reason: Separating responsibilities ensures the producer owns the exchange definition, while the consumer manages its own queue. The consumer uses `get_exchange()` to reference the existing exchange without declaring it, maintaining clear ownership boundaries. Messages are published with routing key format `"new.{orderId}"` (e.g., `"new.ORDER123"`), which matches the `"new.*"` binding pattern.
-

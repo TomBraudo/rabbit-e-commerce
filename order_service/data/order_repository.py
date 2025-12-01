@@ -14,9 +14,19 @@ class OrderRepository:
         self._lock = asyncio.Lock()
 
     async def save(self, order_id: str, order_data: Dict[str, Any]) -> None:
-        """Persist or update an order inside the repository."""
+        """Persist a new order inside the repository.
+
+        If an order with the same ID already exists, the call is a no-op.
+        This allows the consumer to simply ack duplicate messages without
+        mutating existing state.
+        """
         async with self._lock:
+            if order_id in self._orders:
+                logger.info("Duplicate order %s detected, skipping save", order_id)
+                return
+
             self._orders[order_id] = order_data
+
         print(f"Order {order_id} saved successfully")
         logger.info("Order %s saved successfully", order_id)
 

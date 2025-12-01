@@ -3,7 +3,9 @@ version: '3.8'
 services:
   # FastAPI Application
   orders-api:
-    image: tombraudo/cart-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: cart-service
     ports:
       - "8000:8000"

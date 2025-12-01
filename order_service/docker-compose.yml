@@ -3,7 +3,9 @@ version: '3.8'
 services:
   # Order Service FastAPI Application
   order-service-api:
-    image: tombraudo/order-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: order-service
     ports:
       - "8100:8100"
