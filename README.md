@@ -1,8 +1,11 @@
 # Order and Cart Services Overview
 
-## 1. Team Member
-- Full name: **[YOUR NAME HERE]**
-- ID number: **[YOUR ID HERE]**
+## 1.1 Team Member
+- Full name: Tom Braudo
+- ID number: 324182914
+## 1.2 Team Member
+- Full name: Dan Toledano
+- ID number: 
 
 ## 2. Producer & Consumer API Requests
 - **Producer (Cart Service)**  
