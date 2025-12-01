@@ -51,20 +51,6 @@ class OrderResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Dependency functions
-async def get_current_user():
-    """Placeholder for user authentication dependency"""
-    # TODO: Implement user authentication logic
-    pass
-
-async def validate_order_access(order_id: int, user=Depends(get_current_user)):
-    """Validate user has access to specific order"""
-    # TODO: Implement order access validation
-    pass
-
-# Exception handlers will be added to the main FastAPI app
-# Note: Exception handlers should be registered on the main app, not the router
-
 # Helper functions
 def generate_random_string(length: int = 8) -> str:
     """Generate random string for IDs"""
