@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # Order Service FastAPI Application
+  order-service-api:
+    image: tombraudo/order-service:latest
+    container_name: order-service
+    ports:
+      - "8100:8100"
+    environment:
+      - LOG_LEVEL=info
+      - RABBITMQ_URL=amqp://guest:guest@host.docker.internal:5672/
+    networks:
+      - orders-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  orders-network:
+    driver: bridge

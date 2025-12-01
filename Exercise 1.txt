@@ -1,0 +1,46 @@
+Scenario: You are building a simplified backend system for an e-commerce platform. When a customer places an order, the order details must be broadcast to multiple downstream services (e.g., inventory management, billing, and shipping) via RabbitMQ.
+Requirements:
+1. Producer Application (Cart Service):
+o Implement an API endpoint (/create-order) that accepts a request to create a new order. The request must strictly follow this format for the order object. For simplicity, the endpoint will receive only the orderId and number of items(you will generate the array internally) fields from the API, the rest should be randomly auto generated internally.
+
+Order Object Structure:
+
+
+
+Example Order Payload after internally generating the data:
+
+o When a new order is created, the producer should publish the order details as an event to RabbitMQ.
+o The event must be broadcast to all consumers, and the order object should be serialized as JSON before sending.
+
+      Strict Validation Rules for the Producer:
+o Ensure that the input fields are valid inputs.
+o If any of these validation rules fail, return an appropriate error response with a clear message.
+
+2. Consumer Application (Order Service):
+o The consumer should connect to RabbitMQ and receive only new order events where the order status is “new”.
+o Upon receiving an order event, the consumer will perform the following actions:
+1. Calculate Shipping Costs: calculate the shipping costs:
+shippingCost = 2% of totalAmount.
+2. The consumer should log the order details and store them in memory or a simple in-memory database for retrieval. including the shipping cost.
+o Implement an API endpoint (/order-details) that gets an orderId input and returns the order details and shipping costs.
+
+
+Submission instructions:
+
+you need to submit 3 files, 2 docker-compose.yml files (one for the producer and one for the consumer), and one readme file.
+
+In the readme file you will answer the following questions:
+1. Your full name and ID number
+2. The full Url’s and type of API request to generate the producer and the consumer applications.
+3. What type of exchange you chose and why? 
+4. Is there a binding key on the consumer? If so, what is it and why?
+5. Which service declared the exchange and queue and why? 
+
+
+Important instructions:
+1. You must handle basic errors that can be caused and return the correct response in the API (meaning error codes that are not 200OK like 500 with a message)
+
+2. You can write the applications in any language that RabbitMQ supports and you can submit the exercise as requested.
+3. A project that the docker-compose file will not work and the API functions are not reachable will get 0! you must verify your submission is valid!
+4. Submission Due date: 15.12.24 
+
