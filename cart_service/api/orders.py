@@ -89,7 +89,6 @@ async def create_order(
     
     # Random currency and status
     currencies = ["USD", "ILS"]
-    statuses = ["new"]
     
     order_response = OrderResponse(
         orderId=order_request.orderId,
@@ -98,7 +97,7 @@ async def create_order(
         items=items,
         totalAmount=total_amount,
         currency=random.choice(currencies),
-        status=random.choice(statuses)
+        status="new"
     )
     
     # Publish order event to RabbitMQ

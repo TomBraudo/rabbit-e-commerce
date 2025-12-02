@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi import status, Request
 import logging
 import uvicorn
+import asyncio
 from contextlib import asynccontextmanager
 
 # Import your API routers
@@ -22,13 +23,24 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager for startup and shutdown events"""
     # Startup
     logger.info("Starting up the application...")
-    try:
-        # Initialize RabbitMQ connection
-        await rabbitmq_service.connect()
-        logger.info("RabbitMQ connection established")
-    except Exception as e:
-        logger.error(f"Failed to connect to RabbitMQ during startup: {e}")
-        # Continue without RabbitMQ - the service will attempt to reconnect when needed
+
+    max_attempts = 12  # e.g. wait up to ~60 seconds total
+    delay_seconds = 5
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            # Initialize RabbitMQ connection
+            logger.info(f"Attempting to connect to RabbitMQ (attempt {attempt}/{max_attempts})...")
+            await rabbitmq_service.connect()
+            logger.info("RabbitMQ connection established")
+            break
+        except Exception as e:
+            logger.error(f"Failed to connect to RabbitMQ during startup (attempt {attempt}): {e}")
+            if attempt == max_attempts:
+                logger.error("Max attempts reached. Proceeding without RabbitMQ connection.")
+            else:
+                logger.info(f"Waiting {delay_seconds} seconds before next RabbitMQ connection attempt...")
+                await asyncio.sleep(delay_seconds)
     
     yield
     
